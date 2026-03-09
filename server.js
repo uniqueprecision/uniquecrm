@@ -587,7 +587,8 @@ app.post("/api/production/hold", async (req,res)=>{
     if(rows[i][1] === jobId){
 
       rows[i][5] = "HOLD";
-rows[i][8] = rows[i][8] || 0;
+
+      rows[i][7] = new Date().toLocaleString(); // HOLD START
 
       await sh.spreadsheets.values.update({
         spreadsheetId:SPREADSHEET_ID,
@@ -606,41 +607,47 @@ rows[i][8] = rows[i][8] || 0;
 
 });
 
-app.post("/api/production/resume", async (req,res)=>{
+
+app.post("/api/production/resume", async (req, res) => {
 
   const { jobId } = req.body;
   const sh = await getSheets();
 
-  const data = await sh.spreadsheets.values.get({
-    spreadsheetId:SPREADSHEET_ID,
-    range:"Production!A:J"
+  const r = await sh.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: "Production!A:J"
   });
 
-  const rows = data.data.values;
+  const rows = r.data.values;
 
-  for(let i=1;i<rows.length;i++){
+  const idx = rows.findIndex(r => r[1] === jobId && r[5] === "HOLD");
 
-    if(rows[i][1] === jobId){
+  if(idx !== -1){
 
-      rows[idx][5] = "RUNNING";
-rows[idx][6] = rows[idx][6];
+    const holdStart = new Date(rows[idx][7]);
+    const now = new Date();
 
-      await sh.spreadsheets.values.update({
-        spreadsheetId:SPREADSHEET_ID,
-        range:`Production!A${i+1}:J${i+1}`,
-        valueInputOption:"USER_ENTERED",
-        requestBody:{values:[rows[i]]}
-      });
+    const diff = Math.floor((now - holdStart)/60000);
 
-      break;
+    const prev = parseInt(rows[idx][8] || 0);
 
-    }
+    rows[idx][8] = prev + diff;
+
+    rows[idx][5] = "RUNNING";
+
+    await sh.spreadsheets.values.update({
+      spreadsheetId: SPREADSHEET_ID,
+      range: "Production!A:J",
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: rows }
+    });
 
   }
 
-  res.json({success:true});
+  res.json({ success: true });
 
 });
+
 
 /* ===============================
    COMPLETE PRODUCTION
@@ -661,8 +668,16 @@ app.post("/api/production/complete", async (req,res)=>{
 
     if(rows[i][1] === jobId){
 
+      const start = new Date(rows[i][6]);
+      const now = new Date();
+
+      const total = Math.floor((now - start)/60000);
+
+      rows[i][8] = total;
+
       rows[i][5] = "COMPLETED";
-      rows[i][7] = new Date().toLocaleString();
+
+      rows[i][9] = new Date().toLocaleString();
 
       await sh.spreadsheets.values.update({
         spreadsheetId:SPREADSHEET_ID,
@@ -1382,6 +1397,7 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
 
 
