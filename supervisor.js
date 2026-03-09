@@ -1,6 +1,8 @@
+const API = "https://uniquecrm.onrender.com";
+
 async function loadSupervisor() {
 
-  const res = await fetch("/api/supervisor/dashboard");
+  const res = await fetch(API + "/api/supervisor/dashboard");
   const d = await res.json();
 
   document.getElementById("kRun").innerText = d.kpi.running || 0;
@@ -88,7 +90,7 @@ async function submitQC(jobId, result) {
     }
   }
 
-  await fetch("/api/qc/process", {
+  await fetch(API + "/api/qc/process", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -109,6 +111,7 @@ async function submitQC(jobId, result) {
 
   loadSupervisor();
 }
+
 
 
 
