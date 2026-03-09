@@ -1,4 +1,8 @@
-
+function getISTTime(){
+  return new Date().getISTTime()("en-IN", {
+    timeZone: "Asia/Kolkata"
+  });
+}
 
 /* ===============================
    UPW ERP – FINAL STABLE BACKEND
@@ -107,8 +111,8 @@ async function ensureDesignersSheet() {
     valueInputOption: "USER_ENTERED",
     requestBody: {
       values: [
-        ["Rahul", "ACTIVE", new Date().toLocaleString()],
-        ["Suresh", "ACTIVE", new Date().toLocaleString()]
+        ["Rahul", "ACTIVE", new Date().getISTTime()],
+        ["Suresh", "ACTIVE", new Date().getISTTime()]
       ]
     }
   });
@@ -126,8 +130,8 @@ app.post("/api/customers", async (req, res) => {
     const sh = await getSheets();
     const data = req.body;
 
-    const customerId = "CUST-" + Date.now();
-    const now = new Date().toLocaleString();
+    const customerId = "CUST-" + getISTTime();
+    const now = new Date().getISTTime();
 
     await sh.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
@@ -194,14 +198,14 @@ app.post("/api/enquiries", async (req, res) => {
     valueInputOption: "USER_ENTERED",
     requestBody: {
       values: [[
-        "ENQ-" + Date.now(),
+        "ENQ-" + getISTTime(),
         d.customerId, d.customerName,
         new Date().toLocaleDateString(),
         "Admin", d.priority || "",
         d.partName, d.quantity, d.material,
         d.drawing, d.process, d.tolerance,
         d.surface, d.delivery,
-        "NEW", new Date().toLocaleString()
+        "NEW", new Date().getISTTime()
       ]]
     }
   });
@@ -276,7 +280,7 @@ app.post("/api/orders", async (req, res) => {
   if (rows[idx][14] !== "NEW")
     return res.json({ success: false });
 
-  const orderId = "ORD-" + Date.now();
+  const orderId = "ORD-" + getISTTime();
 
  await sh.spreadsheets.values.append({
   spreadsheetId: SPREADSHEET_ID,
@@ -551,25 +555,25 @@ app.post("/api/production/start", async (req, res) => {
 
     const sh = await getSheets();
 
-    await sh.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID,
-      range: "Production!A:J",
-      valueInputOption: "USER_ENTERED",
-      requestBody: {
-        values: [[
-          "PROD-" + new Date().toLocaleString(),
-          jobId,
-          orderId,
-          operator,
-          machine,
-          "RUNNING",
-          new Date().toLocaleString(),
-          "",
-          "",
-          ""
-        ]]
-      }
-    });
+  await sh.spreadsheets.values.append({
+  spreadsheetId: SPREADSHEET_ID,
+  range: "Production!A:J",
+  valueInputOption: "USER_ENTERED",
+  requestBody: {
+    values: [[
+      "PROD-" + getISTTime(),
+      jobId,
+      orderId,
+      operator,
+      machine,
+      "RUNNING",
+      getISTTime(),   // ✅ FIX
+      "",
+      "",
+      ""
+    ]]
+  }
+});
 
     res.json({ success:true });
 
@@ -598,7 +602,7 @@ app.post("/api/production/hold", async (req,res)=>{
     if(rows[i][1] === jobId){
 
      rows[i][5] = "HOLD";
-rows[i][7] = new Date().toLocaleString();
+rows[i][7] = getISTTime();
        rows[i][10] = reason;
 
       await sh.spreadsheets.values.update({
@@ -635,9 +639,9 @@ app.post("/api/production/resume", async (req, res) => {
 
   if(idx !== -1){
 
-    const holdStart = parseInt(rows[idx][7] || Date.now());
+    const holdStart = parseInt(rows[idx][7] || getISTTime());
 
-    const diff = Math.floor((Date.now() - holdStart) / 60000);
+    const diff = Math.floor((getISTTime() - holdStart) / 60000);
 
     const prev = parseInt(rows[idx][8] || 0);
 
@@ -679,13 +683,13 @@ app.post("/api/production/complete", async (req,res)=>{
     if(rows[i][1] === jobId){
 
       const start = new Date(rows[i][6]);
-const total = Math.floor((Date.now() - start) / 60000);
+const total = Math.floor((getISTTime() - start) / 60000);
 
       rows[i][8] = total;
 
       rows[i][5] = "COMPLETED";
 
-      rows[i][9] = new Date().toLocaleString();
+     rows[i][9] = getISTTime();
 
       await sh.spreadsheets.values.update({
         spreadsheetId:SPREADSHEET_ID,
@@ -887,13 +891,13 @@ app.post("/api/qc/update", async (req, res) => {
     valueInputOption: "USER_ENTERED",
     requestBody: {
       values: [[
-        "QC-" + Date.now(),
+        "QC-" + getISTTime(),
         jobId,
         orderId,
         result,
         remarks,
         checkedBy,
-        new Date().toLocaleString()
+        new Date().getISTTime()()
       ]]
     }
   });
@@ -1037,7 +1041,7 @@ app.post("/api/qc/process", async (req, res) => {
     } = req.body;
 
     const sh = await getSheets();
-    const now = new Date().toLocaleString();
+    const now = new Date().getISTTime()();
 
     // Save QC Record
     await sh.spreadsheets.values.append({
@@ -1046,7 +1050,7 @@ app.post("/api/qc/process", async (req, res) => {
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [[
-          "QC-" + Date.now(),
+          "QC-" + getISTTime(),
           jobId,
           result,
           actual,
@@ -1408,6 +1412,7 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
 
 
