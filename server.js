@@ -11,7 +11,7 @@ require("dotenv").config();
 const { google } = require("googleapis");
 
 // GOOGLE AUTH (FIX)
-const auth = new google.auth.GoogleAuth({t
+const auth = new google.auth.GoogleAuth({
   credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
   scopes: [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -1408,6 +1408,7 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
 
 
