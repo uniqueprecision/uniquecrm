@@ -480,16 +480,38 @@ app.get("/api/design/:jobId", async (req, res) => {
 // GET JOBS IN PRODUCTION (FOR DROPDOWN)
 // ===============================
 app.get("/api/jobs/list", async (req, res) => {
+
   try {
+
     const sh = await getSheets();
 
-    // 🔹 Fresh Production Jobs
     const jobsRes = await sh.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
       range: "Jobs!A:J"
     });
 
     const jobsRows = (jobsRes.data.values || []).slice(1);
+
+    const prodRes = await sh.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: "Production!A:J"
+    });
+
+    const prodRows = (prodRes.data.values || []).slice(1);
+
+    const completedJobs = prodRows
+      .filter(r => r[5] === "COMPLETED")
+      .map(r => r[1]);
+
+    const activeJobs = prodRows
+      .filter(r => r[5] === "RUNNING" || r[5] === "HOLD")
+      .map(r => ({
+        jobId: r[1],
+        orderId: r[2],
+        customer: "",
+        requirement: "",
+        machines: [r[4]]
+      }));
 
     const freshJobs = jobsRows
       .filter(r => r[9] === "PRODUCTION")
@@ -501,38 +523,25 @@ app.get("/api/jobs/list", async (req, res) => {
         machines: r[6] ? r[6].split(",").map(m=>m.trim()) : []
       }));
 
-    // 🔹 Active Production Jobs (RUNNING + HOLD)
-    const prodRes = await sh.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: "Production!A:J"
-    });
-
-    const prodRows = (prodRes.data.values || []).slice(1);
-
-  const activeJobs = prodRows
-  .filter(r => r[5] === "RUNNING" || r[5] === "HOLD")
-  .map(r => ({
-    jobId: r[1],
-    orderId: r[2],
-    customer: "",
-    requirement: "",
-    machines: [r[4]]
-  }));
-
     const map = {};
 
-  [...freshJobs, ...activeJobs].forEach(j=>{
-  if(!completedJobs.includes(j.jobId)){
-    map[j.jobId] = j;
-  }
-});
+    [...freshJobs, ...activeJobs].forEach(j => {
+
+      if(!completedJobs.includes(j.jobId)){
+        map[j.jobId] = j;
+      }
+
+    });
 
     res.json(Object.values(map));
 
   } catch (err) {
-    console.error("JOB LIST ERROR:", err);
+
+    console.log(err);
     res.json([]);
+
   }
+
 });
 
 app.post("/api/production/start", async (req, res) => {
@@ -1399,6 +1408,7 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
 
 
