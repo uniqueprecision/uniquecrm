@@ -1,3 +1,5 @@
+const API = "https://uniquecrm.onrender.com";
+
 /* =========================
    UPW ERP – DESIGNER FINAL
 ========================= */
@@ -29,7 +31,7 @@ async function loadDesignerDashboard() {
   inDesignTable.innerHTML = "";
   productionTable.innerHTML = "";
 
-  const res = await fetch("/api/orders/list");
+  const res = await fetch(API + "/api/orders/list");
   const orders = await res.json();
 
   let assigned = 0;
@@ -104,7 +106,7 @@ async function loadDesignerDashboard() {
 ========================= */
 async function startDesign(orderId) {
 
-  const res = await fetch("/api/orders/status", {
+  const res = await fetch(API + "/api/orders/status", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -161,7 +163,7 @@ async function completeDesign() {
 
   console.log("SENDING JOB:", payload);
 
-  const res = await fetch("/api/jobs/create", {
+  const res = await fetch(API + "/api/jobs/create", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
@@ -208,7 +210,7 @@ async function generateQR() {
   }
 
   // 🔥 GET SHORT SEQUENCE FROM SERVER
-  const res = await fetch("/api/job/next-seq");
+  const res = await fetch(API + "/api/job/next-seq");
   const data = await res.json();
 
   const year = new Date().getFullYear().toString().slice(-2);
@@ -235,7 +237,7 @@ async function generateQR() {
 
 async function openDesignWorkspace(orderId) {
 
-  const res = await fetch("/api/orders/list");
+  const res = await fetch(API + "/api/orders/list");
   const orders = await res.json();
   const o = orders.find(x => x.orderId === orderId);
 
@@ -264,4 +266,5 @@ document.addEventListener("DOMContentLoaded", () => {
   showDesignerPage("assigned");
   loadDesignerDashboard();
 });
+
 
