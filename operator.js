@@ -166,9 +166,14 @@ function updateUI(status){
 }
 
 
-// ================= START =================
-startBtn.onclick = async ()=>{
-  if(!validateSelection()) return;
+/* ================= START ================= */
+
+startBtn.onclick = async () => {
+
+  if(!jobDropdown.value || !operatorName.value || !machineName.value){
+    alert("Fill all fields");
+    return;
+  }
 
   const res = await fetch("/api/production/start",{
     method:"POST",
@@ -184,11 +189,15 @@ startBtn.onclick = async ()=>{
   const result = await res.json();
 
   if(result.success){
-    elapsedTime = 0;
-    startTimer();
+
     updateUI("RUNNING");
+
+    startTimer(new Date());
+
   }
+
 };
+
 
 // ================= HOLD =================
 holdBtn.onclick = async ()=>{
@@ -208,9 +217,13 @@ holdBtn.onclick = async ()=>{
   const result = await res.json();
 
   if(result.success){
-    stopTimer();
+
     updateUI("HOLD");
+
+    stopTimer();
+
   }
+
 };
 
 // ================= RESUME =================
@@ -227,9 +240,13 @@ resumeBtn.onclick = async ()=>{
   const result = await res.json();
 
   if(result.success){
-    startTimer();
+
     updateUI("RUNNING");
+
+    startTimer(startTime);
+
   }
+
 };
 
 // ================= COMPLETE =================
@@ -247,15 +264,18 @@ completeBtn.onclick = async ()=>{
 
   if(result.success){
 
-    stopTimer();
     updateUI("COMPLETED");
 
-    // remove job from dropdown
+    stopTimer();
+
     loadJobs();
+
   }
+
 };
 
 window.addEventListener("DOMContentLoaded", () => {
   loadJobs();
 });
+
 
