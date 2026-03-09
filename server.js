@@ -5,7 +5,6 @@
    Google Sheets as Database
 ================================ */
 
-require("dotenv").config();
 
 require("dotenv").config();
 
@@ -49,7 +48,7 @@ app.use(express.static(__dirname));
    ROOT
 ================================ */
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "admin.html"));
+  res.sendFile(path.join(__dirname, "admin.html"));
 });
 
 /* ===============================
@@ -323,7 +322,9 @@ app.post("/api/orders/status", async (req, res) => {
 
     const sh = await getSheets();
 
-    const response = await sh.spreadsheets.values.get({
+    const sh = await getSheets();
+
+const response = await sh.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
       range: "Orders!A:I"
     });
@@ -1436,6 +1437,7 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
 
 
