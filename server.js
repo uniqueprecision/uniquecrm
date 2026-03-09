@@ -43,7 +43,7 @@ const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-OAjqDtgiH53U_W
 /* ===============================
    STATIC FRONTEND
 ================================ */
-app.use(express.static(path.join(__dirname, "frontend")));
+app.use(express.static(__dirname));
 
 /* ===============================
    ROOT
@@ -1436,4 +1436,5 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
