@@ -322,8 +322,6 @@ app.post("/api/orders/status", async (req, res) => {
 
     const sh = await getSheets();
 
-    const sh = await getSheets();
-
 const response = await sh.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
       range: "Orders!A:I"
@@ -1437,6 +1435,7 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
 
 
