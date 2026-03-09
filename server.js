@@ -557,7 +557,7 @@ app.post("/api/production/start", async (req, res) => {
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [[
-          "PROD-" + Date.now(),
+          "PROD-" + new Date().toLocaleString()
           jobId,
           orderId,
           operator,
@@ -598,7 +598,8 @@ app.post("/api/production/hold", async (req,res)=>{
     if(rows[i][1] === jobId){
 
      rows[i][5] = "HOLD";
-rows[i][7] = Date.now();
+rows[i][7] = new Date().toLocaleString();
+       rows[i][10] = reason;
 
       await sh.spreadsheets.values.update({
         spreadsheetId:SPREADSHEET_ID,
@@ -642,7 +643,8 @@ app.post("/api/production/resume", async (req, res) => {
 
     rows[idx][8] = prev + diff;
 
-    rows[idx][5] = "RUNNING";
+   rows[idx][5] = "RUNNING";
+rows[idx][7] = "";
 
     await sh.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
@@ -677,9 +679,7 @@ app.post("/api/production/complete", async (req,res)=>{
     if(rows[i][1] === jobId){
 
       const start = new Date(rows[i][6]);
-      const now = new Date();
-
-      const total = Math.floor((now - start)/60000);
+const total = Math.floor((Date.now() - start) / 60000);
 
       rows[i][8] = total;
 
@@ -1408,6 +1408,7 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
 
 
