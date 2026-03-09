@@ -1,3 +1,5 @@
+const API = "https://uniquecrm.onrender.com";
+
 // =========================
 // CHART INSTANCES (GLOBAL)
 // =========================
@@ -60,7 +62,7 @@ async function loadCustomers() {
   if (customerSelect)
     customerSelect.innerHTML = `<option value="">Select Customer</option>`;
 
-  const res = await fetch("/api/customers/list");
+  const res = await fetch(API +"/api/customers/list");
   const customers = await res.json();
 
   customers.forEach(c => {
@@ -112,7 +114,7 @@ async function addCustomer() {
     return;
   }
 
-  const res = await fetch("/api/customers", {
+  const res = await fetch(API +"/api/customers", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
@@ -155,7 +157,7 @@ async function addEnquiry() {
     return;
   }
 
-  const res = await fetch("/api/enquiries", {
+  const res = await fetch(API +"/api/enquiries", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
@@ -172,7 +174,7 @@ async function addEnquiry() {
 async function loadEnquiries() {
   enquiryTable.innerHTML = "";
 
-  const res = await fetch("/api/enquiries/list");
+  const res = await fetch(API + "/api/enquiries/list");
   const enquiries = await res.json();
 
   enquiries.forEach(e => {
@@ -225,7 +227,7 @@ async function confirmConvertOrder() {
   const enquiryId = document.getElementById("convEnquiryId").value;
 
   // 👇 enquiry table madhun data gheu
-  const resEnq = await fetch("/api/enquiries/list");
+  const resEnq = await fetch(API + "/api/enquiries/list");
   const allEnq = await resEnq.json();
   const enq = allEnq.find(x => x.id === enquiryId);
 
@@ -239,7 +241,7 @@ async function confirmConvertOrder() {
     poReceivedDate: document.getElementById("poReceivedDate").value
   };
 
-  const res = await fetch("/api/orders", {
+  const res = await fetch(API + "/api/orders", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
@@ -252,7 +254,7 @@ async function confirmConvertOrder() {
     return;
   }
 
-  await fetch("/api/enquiries/status", {
+  await fetch(API + "/api/enquiries/status", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ enquiryId, status: "CONVERTED" })
@@ -327,7 +329,7 @@ document.addEventListener("click", async e => {
 async function loadOrders() {
   ordersTable.innerHTML = "";
 
-  const res = await fetch("/api/orders/list");
+  const res = await fetch(API + "/api/orders/list");
   const orders = await res.json();
 
   const table = document.getElementById("ordersTable");
@@ -359,7 +361,7 @@ async function loadOrders() {
 async function assignDesigner(orderId, designer) {
   if (!designer) return;
 
-  await fetch("/api/orders/assign", {
+  await fetch(API +"/api/orders/assign", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ orderId, designer })
@@ -388,7 +390,7 @@ async function confirmConvertOrder() {
   const enquiryId = document.getElementById("convEnquiryId").value;
 
   // 🔥 Get enquiry details
-  const resEnq = await fetch("/api/enquiries/list");
+  const resEnq = await fetch(API +"/api/enquiries/list");
   const allEnq = await resEnq.json();
   const enq = allEnq.find(x => x.id === enquiryId);
 
@@ -410,7 +412,7 @@ async function confirmConvertOrder() {
     }
   }
 
-  const res = await fetch("/api/orders", {
+  const res = await fetch(API +"/api/orders", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
@@ -423,7 +425,7 @@ async function confirmConvertOrder() {
     return;
   }
 
-  await fetch("/api/enquiries/status", {
+  await fetch(API +"/api/enquiries/status", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ enquiryId, status: "CONVERTED" })
@@ -442,7 +444,7 @@ async function confirmConvertOrder() {
 async function loadDashboardKPI() {
   try {
 
-    const res = await fetch("/api/admin/overview");
+    const res = await fetch(API +"/api/admin/overview");
     const data = await res.json();
 
     document.getElementById("kpiTotal").innerText = data.total || 0;
@@ -479,7 +481,7 @@ async function loadCustomerKPI() {
 }
 
 async function loadEnquiryKPI() {
-  const res = await fetch("/api/enquiries/list");
+  const res = await fetch(API +"/api/enquiries/list");
   const e = await res.json();
 
   document.getElementById("enqTotal").innerText = e.length;
@@ -492,7 +494,7 @@ async function loadEnquiryKPI() {
 }
 
 async function loadOrderKPI() {
-  const res = await fetch("/api/orders/list");
+  const res = await fetch(API +"/api/orders/list");
   const o = await res.json();
 
   document.getElementById("ordTotal").innerText = o.length;
@@ -507,7 +509,7 @@ async function loadOrderKPI() {
 }
 
 async function loadDashboardCharts() {
-  const res = await fetch("/api/admin/live-dashboard");
+  const res = await fetch(API +"/api/admin/live-dashboard");
   const data = await res.json();
 
   const design = data.kpi?.created || 0;
@@ -631,7 +633,7 @@ document.getElementById("poStatus").addEventListener("change", function () {
 async function loadAdminOverview() {
   try {
 
-    const res = await fetch("/api/admin/overview");
+    const res = await fetch(API +"/api/admin/overview");
     const data = await res.json();
 
     document.getElementById("totalJobs").innerText = data.total;
@@ -649,7 +651,7 @@ async function loadAdminOverview() {
 window.addEventListener("load", loadAdminOverview);
 
 async function loadDesignerLive() {
-  const res = await fetch("/api/admin/designer-live");
+  const res = await fetch(API +"/api/admin/designer-live");
   const data = await res.json();
 
   const table = document.getElementById("designerLiveBody");
@@ -699,4 +701,5 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", () => {
   loadAdminDashboard();
 });
+
 
