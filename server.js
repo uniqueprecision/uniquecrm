@@ -535,32 +535,36 @@ app.get("/api/jobs/list", async (req, res) => {
 
 app.post("/api/production/start", async (req, res) => {
   try {
-    const { jobId } = req.body;
+
+    const { jobId, orderId, operator, machine } = req.body;
+
     const sh = await getSheets();
 
-    const jobs = await sh.spreadsheets.values.get({
+    await sh.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: "Jobs!A:J"
-    });
-
-    const rows = jobs.data.values;
-    const idx = rows.findIndex(r => r[0] === jobId);
-
-    if (idx === -1) return res.json({ success: false });
-
-    rows[idx][9] = "RUNNING";
-
-    await sh.spreadsheets.values.update({
-      spreadsheetId: SPREADSHEET_ID,
-      range: "Jobs!A:J",
+      range: "Production!A:J",
       valueInputOption: "USER_ENTERED",
-      requestBody: { values: rows }
+      requestBody: {
+        values: [[
+          "PROD-" + Date.now(),
+          jobId,
+          orderId,
+          operator,
+          machine,
+          "RUNNING",
+          new Date().toLocaleString(),
+          "",
+          "",
+          ""
+        ]]
+      }
     });
 
-    res.json({ success: true });
+    res.json({ success:true });
 
-  } catch {
-    res.status(500).json({ success: false });
+  } catch(err){
+    console.log(err);
+    res.json({ success:false });
   }
 });
 /* ===============================
@@ -1435,6 +1439,7 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
 
 
