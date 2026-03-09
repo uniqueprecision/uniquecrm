@@ -508,7 +508,7 @@ app.get("/api/jobs/list", async (req, res) => {
       .map(r => r[1]);
 
     const activeJobs = prodRows
-      .filter(r => r[5] === "RUNNING" || r[5] === "HOLD")
+      .filter(r => r[5] === "RUNNING" || r[5] === "")
       .map(r => ({
         jobId: r[1],
         orderId: r[2],
@@ -591,7 +591,7 @@ app.post("/api/production/hold", async (req,res)=>{
   const sh = await getSheets();
 
   const data = await sh.spreadsheets.values.get({
-    spreadsheetId:SPREADSHEET_ID,
+    spreadsheetId: SPREADSHEET_ID,
     range:"Production!A:J"
   });
 
@@ -599,11 +599,11 @@ app.post("/api/production/hold", async (req,res)=>{
 
   for(let i=1;i<rows.length;i++){
 
-    if(rows[i][1] === jobId){
+    if(rows[i][1] === jobId && rows[i][5] === "RUNNING"){
 
-     rows[i][5] = "HOLD";
-rows[i][7] = getISTTime();
-       rows[i][10] = reason;
+      rows[i][5] = "HOLD";          // status
+      rows[i][7] = getISTTime();    // hold time
+      rows[i][9] = reason || "";    // hold reason
 
       await sh.spreadsheets.values.update({
         spreadsheetId:SPREADSHEET_ID,
@@ -612,15 +612,15 @@ rows[i][7] = getISTTime();
         requestBody:{values:[rows[i]]}
       });
 
-      break;
-
+      return res.json({success:true});
     }
 
   }
 
-  res.json({success:true});
+  res.json({success:false});
 
 });
+
 
 
 app.post("/api/production/resume", async (req, res) => {
@@ -1412,6 +1412,7 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
 
 
