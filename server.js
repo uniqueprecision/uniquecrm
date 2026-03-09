@@ -13,7 +13,7 @@ const { google } = require("googleapis");
 
 // GOOGLE AUTH (FIX)
 const auth = new google.auth.GoogleAuth({
-  keyFile: __dirname + "/credentials.json"
+  keyFile: __dirname + "/credentials.json",
   scopes: [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
@@ -1436,6 +1436,7 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
 
 
