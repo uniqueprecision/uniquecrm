@@ -1,3 +1,5 @@
+const API = "https://uniquecrm.onrender.com";
+
 let timerInterval;
 const timerEl = document.getElementById("timer");
 
@@ -34,7 +36,7 @@ const statusBar = document.getElementById("statusBar");
 
 // ================= LOAD JOBS =================
 async function loadJobs(){
-  const res = await fetch("/api/jobs/list");
+  const res = await fetch(API + "/api/jobs/list");
   const jobs = await res.json();
 
   jobDropdown.innerHTML = `<option value="">Select Job</option>`;
@@ -56,7 +58,7 @@ jobDropdown.addEventListener("change", async ()=>{
   if(!id) return;
 
   // 🔹 Get Job Details
-  const jobRes = await fetch(`/api/jobs/details/${id}`);
+  const jobRes = await fetch(API + `/api/jobs/details/${id}`);
   const job = await jobRes.json();
   if(!job.success) return;
 
@@ -73,7 +75,7 @@ jobDropdown.addEventListener("change", async ()=>{
   });
 
   // 🔹 Get Production Status
-  const statusRes = await fetch(`/api/production/status/${id}`);
+  const statusRes = await fetch(API + `/api/production/status/${id}`);
   const statusData = await statusRes.json();
 
   if(!statusData.success){
@@ -165,7 +167,7 @@ startBtn.onclick = async ()=>{
     return;
   }
 
-  const res = await fetch("/api/production/start",{
+  const res = await fetch(API + "/api/production/start",{
     method:"POST",
     headers:{ "Content-Type":"application/json"},
     body:JSON.stringify({
@@ -245,4 +247,5 @@ completeBtn.onclick = async ()=>{
 window.addEventListener("DOMContentLoaded", () => {
   loadJobs();
 });
+
 
