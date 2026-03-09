@@ -509,21 +509,23 @@ app.get("/api/jobs/list", async (req, res) => {
 
     const prodRows = (prodRes.data.values || []).slice(1);
 
-    const activeJobs = prodRows
-      .filter(r => r[5] === "RUNNING" || r[5] === "HOLD")
-      .map(r => ({
-        jobId: r[1],
-        orderId: r[2],
-        customer: "",
-        requirement: "",
-        machines: [r[4]]
-      }));
+  const activeJobs = prodRows
+  .filter(r => r[5] === "RUNNING" || r[5] === "HOLD")
+  .map(r => ({
+    jobId: r[1],
+    orderId: r[2],
+    customer: "",
+    requirement: "",
+    machines: [r[4]]
+  }));
 
     const map = {};
 
-    [...freshJobs, ...activeJobs].forEach(j=>{
-      map[j.jobId] = j;
-    });
+  [...freshJobs, ...activeJobs].forEach(j=>{
+  if(!completedJobs.includes(j.jobId)){
+    map[j.jobId] = j;
+  }
+});
 
     res.json(Object.values(map));
 
@@ -586,9 +588,8 @@ app.post("/api/production/hold", async (req,res)=>{
 
     if(rows[i][1] === jobId){
 
-      rows[i][5] = "HOLD";
-
-      rows[i][7] = new Date().toLocaleString(); // HOLD START
+     rows[i][5] = "HOLD";
+rows[i][7] = Date.now();
 
       await sh.spreadsheets.values.update({
         spreadsheetId:SPREADSHEET_ID,
@@ -624,10 +625,9 @@ app.post("/api/production/resume", async (req, res) => {
 
   if(idx !== -1){
 
-    const holdStart = new Date(rows[idx][7]);
-    const now = new Date();
+    const holdStart = parseInt(rows[idx][7] || Date.now());
 
-    const diff = Math.floor((now - holdStart)/60000);
+    const diff = Math.floor((Date.now() - holdStart) / 60000);
 
     const prev = parseInt(rows[idx][8] || 0);
 
@@ -647,7 +647,6 @@ app.post("/api/production/resume", async (req, res) => {
   res.json({ success: true });
 
 });
-
 
 /* ===============================
    COMPLETE PRODUCTION
@@ -701,6 +700,7 @@ app.post("/api/production/complete", async (req,res)=>{
 // GET CURRENT PRODUCTION STATUS
 // ===============================
 app.get("/api/production/status/:jobId", async (req, res) => {
+
   const sh = await getSheets();
 
   const r = await sh.spreadsheets.values.get({
@@ -723,7 +723,9 @@ app.get("/api/production/status/:jobId", async (req, res) => {
     status: latestRow[5],
     startTime: latestRow[6]
   });
+
 });
+
 /* ======================================================
    DASHBOARD LIVE
 ====================================================== */
@@ -1397,6 +1399,7 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
 
 
