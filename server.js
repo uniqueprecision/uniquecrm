@@ -1,8 +1,4 @@
-function getISTTime(){
-  return new Date().getISTTime()("en-IN", {
-    timeZone: "Asia/Kolkata"
-  });
-}
+
 
 /* ===============================
    UPW ERP – FINAL STABLE BACKEND
@@ -13,6 +9,12 @@ function getISTTime(){
 require("dotenv").config();
 
 const { google } = require("googleapis");
+
+function getISTTime(){
+  return new Date().toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata"
+  });
+}
 
 // GOOGLE AUTH (FIX)
 const auth = new google.auth.GoogleAuth({
@@ -1412,6 +1414,7 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
 
 
