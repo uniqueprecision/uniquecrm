@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UPW ERP – Admin</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+
+
+<!-- ===== GLOBAL SEARCH RESULT MODAL ===== -->
+<div id="searchModal" class="search-modal">
+  <div class="search-box">
+    <h3>Search Result</h3>
+    <div id="searchResult"></div>
+    <button onclick="closeSearch()">Close</button>
+  </div>
+</div>
+
+
+
+<body>
+
+  <!-- ===== ORDER TIMELINE MODAL ===== -->
+<div id="timelineModal" class="search-modal">
+  <div class="search-box" style="width:600px">
+
+    <h3>
+      Order Timeline –
+      <span id="timelineOrderId" style="color:#2563eb"></span>
+    </h3>
+
+    <div id="timelineSteps" style="margin-top:20px"></div>
+
+    <div style="text-align:right;margin-top:20px">
+      <button onclick="closeTimeline()">Close</button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ===== TOP BAR ===== -->
+<div class="topbar">
+  <div class="logo">
+    <img src="logo.png" style="height:28px;vertical-align:middle;margin-right:8px;">
+    Unique Precision Works – ERP
+  </div>
+
+  <div style="display:flex;gap:8px;align-items:center">
+    <input
+      id="globalSearch"
+      placeholder="Search Order / Job / Enquiry ID"
+      style="height:34px;border-radius:8px;border:none;padding:0 12px;width:260px"
+    />
+    <button onclick="globalSearch()">Search</button>
+    <span class="profile">Admin</span>
+  </div>
+</div>
+
+
+
+<!-- ===== LAYOUT ===== -->
+<div class="layout">
+
+  <!-- ===== SIDEBAR ===== -->
+  <div class="sidebar">
+    <h4>MASTER</h4>
+    <a class="active" onclick="showPage('dashboard', this)">Dashboard</a>
+<a onclick="showPage('customers', this)">Customers</a>
+<a onclick="showPage('enquiries', this)">Enquiries</a>
+<a onclick="showPage('orders', this)">Orders</a> 
+
+
+
+
+
+  </div>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+
+  
+<!-- ================= DASHBOARD ================= -->
+<div class="page active" id="page-dashboard">
+
+  <div class="kpi-grid">
+
+  <div class="kpi-card">
+    <h4>Total Jobs</h4>
+    <h2 id="kpiTotal">0</h2>
+  </div>
+
+  <div class="kpi-card">
+    <h4>In Production</h4>
+    <h2 id="kpiProduction">0</h2>
+  </div>
+
+  <div class="kpi-card">
+    <h4>Running</h4>
+    <h2 id="kpiRunning">0</h2>
+  </div>
+
+  <div class="kpi-card red">
+    <h4>QC Pending</h4>
+    <h2 id="kpiQcPending">0</h2>
+  </div>
+
+  <div class="kpi-card green">
+    <h4>Delivery Ready</h4>
+    <h2 id="kpiDeliveryReady">0</h2>
+  </div>
+
+  <div class="kpi-card orange">
+    <h4>Rejected</h4>
+    <h2 id="kpiRejected">0</h2>
+  </div>
+
+</div>
+
+<div class="live-grid">
+
+  <!-- DESIGNER LIVE -->
+  <div class="live-card">
+    <h3>🎨 Designer Live</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Customer</th>
+          <th>Designer</th>
+        </tr>
+      </thead>
+      <tbody id="designerLiveTable"></tbody>
+      <tbody id="designerLiveBody"></tbody>
+    </table>
+  </div>
+
+  <!-- MACHINE LIVE -->
+  <div class="live-card">
+    <h3>⚙️ Machine Live</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Job</th>
+          <th>Machine</th>
+          <th>Operator</th>
+        </tr>
+      </thead>
+      <tbody id="machineLiveTable"></tbody>
+    </table>
+  </div>
+
+  <!-- QC CONTROL -->
+  <div class="live-card">
+    <h3>🧪 QC Control</h3>
+    <div class="qc-box">
+      <p>QC Pending: <span id="liveQcPending">0</span></p>
+      <p>Rejected: <span id="liveRejected">0</span></p>
+      <p>Ready For Dispatch: <span id="liveReady">0</span></p>
+    </div>
+  </div>
+
+</div>
+
+  <!-- CHART SECTION -->
+  <div class="card">
+    <h3>Overall Production Status</h3>
+
+    <div class="dashboard-charts">
+      <div class="chart-box">
+        <canvas id="statusPie"></canvas>
+      </div>
+
+      <div class="chart-box">
+        <canvas id="machineBar"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+  <h3>Customer Insights</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Customer</th>
+        <th>Enquiries</th>
+        <th>Orders</th>
+        <th>Last Job</th>
+      </tr>
+    </thead>
+    <tbody id="customerInsightTable"></tbody>
+  </table>
+</div>
+
+
+  <div class="card">
+  <h3>Live Job Status</h3>
+
+  <div class="stats">
+  <div class="stat-card green">
+    <p>Running Today</p>
+    <h2 id="todayRunning">0</h2>
+  </div>
+  <div class="stat-card amber">
+    <p>On Hold</p>
+    <h2 id="todayHold">0</h2>
+  </div>
+  <div class="stat-card blue">
+    <p>Completed Today</p>
+    <h2 id="todayCompleted">0</h2>
+  </div>
+</div>
+
+
+  <table class="erp-table">
+    <thead>
+      <tr>
+        <th>Job ID</th>
+        <th>Customer</th>
+        <th>Part</th>
+        <th>Status</th>
+        <th>Last Update</th>
+      </tr>
+    </thead>
+    <tbody id="liveJobsTable"></tbody>
+  </table>
+</div>
+
+
+</div>
+
+
+
+    
+
+    <!-- ================= CUSTOMERS ================= -->
+    <div class="page" id="page-customers">
+
+      <!-- ================= CUSTOMER KPI ================= -->
+<div class="stats customer-kpi">
+
+  <div class="stat-card blue">
+    <p>Total Customers</p>
+    <h2 id="custTotal">0</h2>
+  </div>
+
+  <div class="stat-card green">
+    <p>Active</p>
+    <h2 id="custActive">0</h2>
+  </div>
+
+  <div class="stat-card red">
+    <p>Inactive</p>
+    <h2 id="custInactive">0</h2>
+  </div>
+
+  <div class="stat-card amber">
+    <p>With Orders</p>
+    <h2 id="custWithOrders">0</h2>
+  </div>
+
+  <div class="stat-card gray">
+    <p>Repeat Customers</p>
+    <h2 id="custRepeat">0</h2>
+  </div>
+
+</div>
+
+      <div class="card customer-master">
+
+  
+
+
+        <h4>Basic Information</h4>
+        <div class="form-row">
+          <input id="custName" placeholder="Customer Name">
+          <input id="companyName" placeholder="Company Name">
+          <input id="contactPerson" placeholder="Contact Person">
+        </div>
+
+        <div class="form-row">
+          <input id="custPhone" placeholder="Mobile Number">
+          <input id="altPhone" placeholder="Alternate Mobile">
+          <input id="custEmail" placeholder="Email ID">
+        </div>
+
+        <h4>Company Details</h4>
+        <div class="form-row">
+          <input id="industry" placeholder="Industry Type">
+          <input id="address" placeholder="Address">
+          <input id="city" placeholder="City">
+        </div>
+
+        <div class="form-row">
+          <input id="state" placeholder="State">
+          <input id="pincode" placeholder="Pincode">
+          <input id="country" placeholder="Country">
+        </div>
+
+        <h4>Commercial Details</h4>
+        <div class="form-row">
+          <input id="gst" placeholder="GST Number">
+          <input id="pan" placeholder="PAN Number">
+          <select id="paymentTerms">
+            <option value="">Payment Terms</option>
+            <option>Advance</option>
+            <option>15 Days</option>
+            <option>30 Days</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <input id="creditLimit" placeholder="Credit Limit (₹)">
+          <select id="customerStatus">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+          <select id="source">
+            <option value="">Source</option>
+            <option>Reference</option>
+            <option>Exhibition</option>
+            <option>Cold Call</option>
+            <option>Website</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <input id="salesPerson" placeholder="Assigned Sales Person">
+          <input id="notes" placeholder="Notes / Remarks">
+        </div>
+
+        <button onclick="addCustomer()">Save Customer</button>
+        <p id="custMsg"></p>
+      </div>
+
+      <div class="card">
+        <h3>Customer List</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Customer</th>
+              <th>Company</th>
+              <th>Mobile</th>
+              <th>Email</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="customerTable"></tbody>
+        </table>
+      </div>
+      
+
+    </div>
+
+    <!-- ================= ENQUIRY MASTER ================= -->
+<div class="page" id="page-enquiries">
+
+  <!-- ===== KPI STRIP ===== -->
+  <div class="stats">
+    <div class="stat-card blue">
+      <p>Total Enquiries</p>
+      <h2 id="enqTotal">0</h2>
+    </div>
+    <div class="stat-card amber">
+      <p>New</p>
+      <h2 id="enqNew">0</h2>
+    </div>
+    <div class="stat-card green">
+      <p>Converted</p>
+      <h2 id="enqConverted">0</h2>
+    </div>
+    <div class="stat-card red">
+      <p>Closed</p>
+      <h2 id="enqClosed">0</h2>
+    </div>
+  </div>
+
+  <!-- ===== ENQUIRY LIST ===== -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>Enquiry List</h3>
+      <button onclick="toggleEnquiryForm()">+ Add Enquiry</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Enquiry ID</th>
+          <th>Customer</th>
+          <th>Part</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="enquiryTable"></tbody>
+    </table>
+  </div>
+
+
+  <!-- ===== ADD ENQUIRY FORM (HIDDEN) ===== -->
+  <div class="card" id="enquiryForm" style="display:none">
+
+    <h3>New Enquiry</h3>
+
+    <div class="form-row">
+      <select id="enqCustomer"></select>
+      <select id="enqPriority">
+        <option>Normal</option>
+        <option>High</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <input id="partName" placeholder="Part / Requirement">
+      <input id="quantity" placeholder="Quantity">
+      <select id="material">
+        <option value="">Material</option>
+        <option>MS</option>
+        <option>EN8</option>
+        <option>SS</option>
+        <option>Aluminium</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <select id="drawing">
+        <option>No</option>
+        <option>Yes</option>
+      </select>
+      <select id="process">
+        <option>Machining</option>
+        <option>Fabrication</option>
+      </select>
+      <input id="delivery" placeholder="Delivery Expectation">
+    </div>
+
+    <button onclick="addEnquiry()">Save Enquiry</button>
+
+  </div>
+
+</div>
+
+    <!-- ================= ORDERS ================= -->
+    <div class="page" id="page-orders">
+
+      <!-- ===== ORDERS KPI ===== -->
+<div class="stats">
+  <div class="stat-card blue">
+    <p>Total Orders</p>
+    <h2 id="ordTotal">0</h2>
+  </div>
+
+  <div class="stat-card amber">
+    <p>Created</p>
+    <h2 id="ordCreated">0</h2>
+  </div>
+
+  <div class="stat-card green">
+    <p>Assigned</p>
+    <h2 id="ordAssigned">0</h2>
+  </div>
+
+  <div class="stat-card red">
+    <p>Locked</p>
+    <h2 id="ordLocked">0</h2>
+  </div>
+
+  <div class="stat-card gray">
+    <p>Completed</p>
+    <h2 id="ordCompleted">0</h2>
+  </div>
+</div>
+
+
+
+      <div class="card">
+        <h3>Orders</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Requirement</th>
+              <th>Designer</th>
+              <th>Status</th>
+              <th>Timeline</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTable"></tbody>
+          
+
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<div id="convertOrderModal" class="search-modal">
+  <div class="search-box" style="width:500px">
+    <h3>Convert To Order</h3>
+
+    <input type="hidden" id="convEnquiryId">
+
+    <div class="form-group">
+  <label>PO Status</label>
+  <select id="poStatus">
+    <option value="PENDING">PO Pending</option>
+    <option value="RECEIVED">PO Received</option>
+  </select>
+</div>
+
+    <div id="poExtraFields" style="display:none; margin-top:15px;">
+
+  <div class="po-grid">
+
+    <div class="form-group">
+      <label>PO Number</label>
+      <input id="poNumber" type="text">
+    </div>
+
+    <div class="form-group">
+      <label>PO Received Date</label>
+      <input id="poReceivedDate" type="date">
+    </div>
+
+    <div class="form-group full-width">
+      <label>Note</label>
+      <textarea id="poNote"></textarea>
+    </div>
+
+  </div>
+
+</div>
+
+    <div style="text-align:right;margin-top:15px">
+      <button onclick="confirmConvertOrder()">Convert</button>
+      <button onclick="closeConvertModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+
+</body>
+</html>
+
+
+<!-- ===== ORDER → JOBS DRILL DOWN ===== -->
+<div class="card" id="orderJobsBox" style="display:none">
+
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <h3>
+      Jobs for Order:
+      <span id="jobOrderId" style="color:#2563eb"></span>
+    </h3>
+
+    <button onclick="closeOrderJobs()">← Back to Orders</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Job ID</th>
+        <th>Customer</th>
+        <th>Part</th>
+        <th>Designer</th>
+        <th>Status</th>
+        <th>Updated</th>
+      </tr>
+    </thead>
+    <tbody id="orderJobsTable"></tbody>
+  </table>
+
+  <td style="display:flex;gap:6px">
+  <button class="btn-view" onclick="viewTimeline('ORD-123')">View</button>
+  <td>
+  <button
+  class="btn btn-sm btn-outline-primary"
+  onclick="event.stopPropagation(); openAssignModal('ORD123')">
+  Assign
+</button>
+<button class="btn btn-success" onclick="assignDesigner()">
+  Assign
+</button>
+
+<div id="assignModal" style="display:none">
+  <h3 id="assignOrderId"></h3>
+
+  <select id="designerSelect">
+    <option value="">Select Designer</option>
+  </select>
+
+  <button onclick="assignDesigner()">Assign</button>
+  <button onclick="closeAssignModal()">Cancel</button>
+</div>
+
+<!-- ================= PRODUCTION ================= -->
+<div class="page" id="page-production">
+
+  <!-- KPI -->
+  <div class="stats">
+    <div class="stat-card blue">
+      <p>Running Jobs</p>
+      <h2 id="prodRunning">0</h2>
+    </div>
+
+    <div class="stat-card amber">
+      <p>On Hold</p>
+      <h2 id="prodHold">0</h2>
+    </div>
+
+    <div class="stat-card green">
+      <p>Completed</p>
+      <h2 id="prodCompleted">0</h2>
+    </div>
+
+    <div class="stat-card gray">
+      <p>Active Machines</p>
+      <h2 id="prodMachines">0</h2>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="card">
+    <h3>Live Production Floor</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Job ID</th>
+          <th>Operator</th>
+          <th>Machine</th>
+          <th>Status</th>
+          <th>Start Time</th>
+        </tr>
+      </thead>
+      <tbody id="productionTable">
+        <tr>
+          <td colspan="5" style="text-align:center;color:#999">
+            Loading production data...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<div id="page-reports" class="page" style="display:none">
+  <h3>Reports</h3>
+
+  <div class="stats">
+    <div class="stat-card blue">Total Enquiries<br><b id="repEnq">0</b></div>
+    <div class="stat-card green">Total Orders<br><b id="repOrd">0</b></div>
+    <div class="stat-card amber">Converted<br><b id="repConv">0</b></div>
+    <div class="stat-card red">Lost<br><b id="repLost">0</b></div>
+  </div>
+</div>
+
+
+
+
+
+
+<!-- ================= DESIGN SCREEN ================= -->
+<div class="page" id="page-design">
+
+  <div class="card">
+    <h3>Design Finalization</h3>
+    <small>Complete design details before generating QR</small>
+  </div>
+
+  <div class="card enquiry-form-card">
+    <h4>Design Details</h4>
+
+    <div class="form-row">
+      <input id="designJobId" placeholder="Job ID" readonly>
+      <input id="designOrderId" placeholder="Order ID" readonly>
+    </div>
+
+    <div class="form-row">
+      <input id="designCustomer" placeholder="Customer Name" readonly>
+      <input id="designPart" placeholder="Part / Requirement" readonly>
+    </div>
+
+    <div class="form-row">
+      <input id="designNo" placeholder="Design Number">
+      <input id="drawingNo" placeholder="Drawing Number">
+    </div>
+
+    <div class="form-row">
+      <select id="designMaterial">
+        <option value="">Material</option>
+        <option>MS</option>
+        <option>EN8</option>
+        <option>SS</option>
+        <option>Aluminium</option>
+      </select>
+
+      <select id="designRevision">
+        <option value="R0">Revision R0</option>
+        <option value="R1">Revision R1</option>
+        <option value="R2">Revision R2</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <input id="designNotes" placeholder="Design Notes / Special Instructions">
+    </div>
+
+    <button onclick="finalizeDesignUI()">
+      Finalize Design & Generate QR
+    </button>
+
+  </div>
+
+</div>
+
+
+<div class="card">
+  <h3>Quick Actions</h3>
+
+  <div class="quick-actions">
+    <button onclick="showPage('customers')">➕ Add Customer</button>
+    <button onclick="showPage('enquiries')">📩 New Enquiry</button>
+    <button onclick="showPage('orders')">📦 View Orders</button>
+    <button onclick="showPage('production')">🏭 Production Floor</button>
+  </div>
+</div>
+
+

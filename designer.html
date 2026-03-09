@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>UPW ERP – Designer</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
+</head>
+
+<body>
+
+<!-- ===== TOP BAR ===== -->
+<div class="topbar">
+  <div class="logo">UPW ERP – Designer</div>
+  <div class="profile">Designer</div>
+</div>
+
+<div class="layout">
+
+  <!-- ===== SIDEBAR ===== -->
+  <div class="sidebar">
+    <h4>DESIGNER</h4>
+
+<a class="active" onclick="showDesignerPage('assigned')">
+  Assigned Orders
+</a>
+
+<a onclick="showDesignerPage('indesign')">
+  In Design
+</a>
+
+<a onclick="showDesignerPage('production')">
+  Production
+</a>
+</div>
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+
+    <!-- ================= DASHBOARD ================= -->
+     <!-- KPI ROW -->
+<div class="stats">
+  <div class="stat-card blue">
+    <p>Assigned</p>
+    <h2 id="kpiAssigned">0</h2>
+  </div>
+  <div class="stat-card amber">
+    <p>In Progress</p>
+    <h2 id="kpiInProgress">0</h2>
+  </div>
+  <div class="stat-card green">
+    <p>Completed</p>
+    <h2 id="kpiCompleted">0</h2>
+  </div>
+  <div class="stat-card gray">
+    <p>Production</p>
+    <h2 id="kpiProduction">0</h2>
+  </div>
+</div>
+
+    <!-- ASSIGNED -->
+<div class="page active" id="page-assigned">
+  <div class="card">
+    <h3>Assigned Orders</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Requirement</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="assignedTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- IN DESIGN -->
+<div class="page" id="page-indesign">
+  <div class="card">
+    <h3>In Design</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Started At</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="inDesignTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PRODUCTION -->
+<div class="page" id="page-production">
+  <div class="card">
+    <h3>Production</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="productionTable"></tbody>
+    </table>
+  </div>
+</div>
+
+    <!-- ================= DESIGN WORKSPACE ================= -->
+    <div class="page" id="page-design">
+
+      <div class="card">
+        <h3 class="section-title">Design Workspace</h3>
+
+
+        <div class="form-row">
+          <input id="wsOrderId" readonly placeholder="Order ID">
+          <input id="wsCustomer" readonly placeholder="Customer">
+        </div>
+
+        <div class="form-row">
+          <input id="wsRequirement" readonly placeholder="Requirement">
+          <input id="wsDesignNo" readonly placeholder="Design No">
+        </div>
+
+        <div class="form-row">
+          <input id="wsDesignerName" placeholder="Designer Name" required>
+          <input id="wsDesignDate" type="date">
+        </div>
+
+        <div class="form-row">
+          <input id="wsRemarks" placeholder="Design Notes">
+        </div>
+
+        <!-- ===== EXTRA DESIGN DETAILS ===== -->
+<div class="form-row">
+  <select id="wsDesignType">
+    <option value="NEW">New Design</option>
+    <option value="REWORK">Rework</option>
+  </select>
+
+  <input id="wsMaterial" placeholder="Material Used">
+</div>
+
+<div class="machine-box">
+
+  <label class="machine-pill">
+    <input type="checkbox" class="machineChk" value="DRO">
+    <span>DRO</span>
+  </label>
+
+  <label class="machine-pill">
+    <input type="checkbox" class="machineChk" value="Milling x2">
+    <span>Milling 01</span>
+  </label>
+
+  <label class="machine-pill">
+    <input type="checkbox" class="machineChk" value="Milling x2">
+    <span>Milling 02</span>
+  </label>
+
+  <label class="machine-pill">
+    <input type="checkbox" class="machineChk" value="Surface Grinding">
+    <span>Surface Grinding</span>
+  </label>
+
+  <label class="machine-pill">
+    <input type="checkbox" class="machineChk" value="Tapping">
+    <span>Tapping</span>
+  </label>
+
+  <label class="machine-pill">
+    <input type="checkbox" class="machineChk" value="VMC x2">
+    <span>VMC Old</span>
+  </label>
+
+   <label class="machine-pill">
+    <input type="checkbox" class="machineChk" value="VMC x2">
+    <span>VMC New</span>
+  </label>
+
+
+  <label class="machine-pill">
+    <input type="checkbox" class="machineChk" value="Wirecut">
+    <span>Wirecut</span>
+  </label>
+
+  <label class="machine-pill">
+    <input type="checkbox" class="machineChk" value="Blackodizing">
+    <span>Blackodizing</span>
+  </label>
+
+  <label class="machine-pill">
+    <input type="checkbox" class="machineChk" value="Hardning">
+    <span>Hardning</span>
+  </label>
+
+  <label class="machine-pill">
+    <input type="checkbox" class="machineChk" value="CNC">
+    <span>CNC</span>
+  </label>
+
+</div>
+<div style="height: 16px;"></div>
+
+<div class="form-row">
+  <textarea id="wsOperatorRemark"
+    placeholder="Operator Instructions"></textarea>
+</div>
+
+       <div class="qr-section">
+  <h4>Job QR Code</h4>
+
+  <div style="margin-bottom:10px;">
+    <strong>Job ID:</strong>
+    <span id="displayJobId" style="color:green;font-weight:bold;"></span>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <strong>Design ID:</strong>
+    <span id="displayDesignId" style="color:blue;font-weight:bold;"></span>
+  </div>
+
+  <div class="qr-box">
+    <canvas id="qrCanvas"></canvas>
+  </div>
+
+  <button id="btnQR" onclick="generateQR()">Generate QR</button>
+
+  <button id="btnComplete" onclick="completeDesign()">
+    Design Completed & Create Job
+  </button>
+</div>
+
+    <!-- ================= PRODUCTION CONFIRM ================= -->
+    
+
+<script src="designer.js?v=999"></script>
+</body>
+</html>

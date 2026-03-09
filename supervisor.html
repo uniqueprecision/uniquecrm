@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>UPW ERP – Supervisor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dark-erp">
+
+<!-- ================= QC MODAL ================= -->
+<div id="qcModal" class="qc-modal">
+  <div class="qc-box">
+
+  
+
+    <!-- DESIGN DETAILS (READ ONLY – future ready) -->
+    <div class="qc-row">
+      <label>Design Measurement</label>
+      <input id="qcDesignMeas" readonly>
+    </div>
+
+    <div class="qc-row">
+      <label>Tolerance</label>
+      <input id="qcTolerance" readonly>
+    </div>
+
+    <div class="qc-row">
+      <label>Actual Measurement</label>
+      <input id="qcActual">
+    </div>
+
+    <textarea
+      id="qcRemark"
+      placeholder="QC Remark / Rejection Reason (mandatory for Reject)">
+    </textarea>
+
+    <div class="qc-actions">
+      <button class="qc-approve" onclick="confirmApprove()">✔ APPROVE</button>
+      <button class="qc-reject" onclick="qcReject()">✖ REJECT</button>
+      <button class="qc-cancel" onclick="closeQC()">Cancel</button>
+      <button onclick="toggleQC('JOB123')">
+  Start QC
+</button>
+
+<div id="qc-JOB123" class="qc-section" style="display:none;">
+  <!-- QC form fields -->
+</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= TOP BAR ================= -->
+<div class="topbar">
+  <div class="logo">UPW ERP</div>
+  <div class="top-actions">
+    <span class="profile">Supervisor</span>
+  </div>
+</div>
+
+<div class="erp-container">
+
+  <!-- KPI ROW -->
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <span>RUNNING JOBS</span>
+      <h2 id="kRun">0</h2>
+    </div>
+    <div class="kpi-card amber">
+      <span>ON HOLD</span>
+      <h2 id="kHold">0</h2>
+    </div>
+    <div class="kpi-card green">
+      <span>COMPLETED</span>
+      <h2 id="kDone">0</h2>
+    </div>
+    <div class="kpi-card gray">
+      <span>OPERATORS</span>
+      <h2 id="kOp">0</h2>
+    </div>
+  </div>
+
+  <!-- ===== SHIFT KPI ===== -->
+<div class="kpi-grid industrial">
+
+  <div class="kpi-card blue">
+    <span>SHIFT RUNNING</span>
+    <h2 id="kShiftRun">0</h2>
+  </div>
+
+  <div class="kpi-card amber">
+    <span>SHIFT HOLD</span>
+    <h2 id="kShiftHold">0</h2>
+  </div>
+
+  <div class="kpi-card green">
+    <span>SHIFT COMPLETED</span>
+    <h2 id="kShiftDone">0</h2>
+  </div>
+
+  <div class="kpi-card red">
+    <span>IDLE MACHINES</span>
+    <h2 id="kIdle">0</h2>
+  </div>
+
+  <div class="kpi-card gray">
+    <span>AVG CYCLE (min)</span>
+    <h2 id="kAvgCycle">0</h2>
+  </div>
+
+</div>
+
+
+  <!-- LIVE PRODUCTION -->
+  <div class="card">
+    <h3>Live Production Floor</h3>
+
+    <table class="erp-table">
+      <thead>
+        <tr>
+          <th>Job ID</th>
+          <th>Operator</th>
+          <th>Machine</th>
+          <th>Status</th>
+          <th>Started</th>
+          <th>Hold Reason</th>
+        </tr>
+      </thead>
+      <tbody id="prodTable"></tbody>
+    </table>
+  </div>
+
+ 
+
+
+  <!-- QC SECTION -->
+  <div class="card">
+    <h3>QC Pending Approval</h3>
+
+
+    <table class="erp-table">
+      <thead>
+        <tr>
+          <th>Job ID</th>
+          <th>Operator</th>
+          <th>Machine</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="qcTable"></tbody>
+    </table>
+  </div>
+
+<div id="qcModal" class="qc-modal">
+
+</div>
+    
+</div>
+
+<script src="supervisor.js"></script>
+</body>
+</html>

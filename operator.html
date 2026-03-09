@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UPW ERP – Operator</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Segoe UI,Arial;
+  background:#f4f6f9;
+}
+
+.header{
+  background:#1f3c88;
+  color:white;
+  padding:15px;
+  font-weight:600;
+}
+
+.container{
+  max-width:700px;
+  margin:20px auto;
+  padding:20px;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:8px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom:20px;
+}
+
+label{
+  font-size:13px;
+  font-weight:600;
+  margin-bottom:5px;
+  display:block;
+}
+
+select,input{
+  width:100%;
+  padding:8px;
+  border:1px solid #ccc;
+  border-radius:6px;
+  margin-bottom:15px;
+}
+
+.status{
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+.timer{
+  font-weight:bold;
+  font-size:16px;
+  margin-bottom:15px;
+}
+
+button{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:6px;
+  font-weight:600;
+  cursor:pointer;
+  margin-bottom:10px;
+}
+
+.start{ background:#2e7d32; color:white; }
+.hold{ background:#f9a825; color:white; }
+.resume{ background:#00897b; color:white; }
+.complete{ background:#1565c0; color:white; }
+
+button:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">UPW ERP – Production Panel</div>
+
+<div class="container">
+
+<div class="card">
+<h3>Job Details</h3>
+
+<label>Job ID</label>
+<select id="jobDropdown"></select>
+
+<label>Order ID</label>
+<input id="orderId" readonly>
+
+<label>Customer</label>
+<input id="customer" readonly>
+
+<label>Requirement</label>
+<input id="requirement" readonly>
+
+<div id="statusBar" class="status">Status: IDLE</div>
+<div id="timer" class="timer">00:00:00</div>
+</div>
+
+<div class="card">
+<h3>Production</h3>
+
+<label>Operator</label>
+<select id="operatorName">
+<option value="">Select Operator</option>
+<option>Prakash</option>
+<option>Ramesh</option>
+<option>Suresh</option>
+</select>
+
+<label>Machine</label>
+<select id="machineName"></select>
+
+<button id="startBtn" class="start">START</button>
+<button id="holdBtn" class="hold">HOLD</button>
+<button id="resumeBtn" class="resume">RESUME</button>
+<button id="completeBtn" class="complete">COMPLETE</button>
+
+</div>
+</div>
+
+<script src="operator.js"></script>
+</body>
+</html>
