@@ -1,20 +1,26 @@
-const API = "https://uniquecrm.onrender.com";
-
 let timerInterval;
+let elapsedTime = 0;
+let startTimestamp = null;
+let currentStatus = "IDLE";
+
 const timerEl = document.getElementById("timer");
 
-function startTimer(startTime){
-  clearInterval(timerInterval);
+function startTimer(){
+  startTimestamp = Date.now() - elapsedTime;
 
   timerInterval = setInterval(()=>{
-    const diff = Date.now() - new Date(startTime).getTime();
+    elapsedTime = Date.now() - startTimestamp;
 
-    const hours = String(Math.floor(diff/3600000)).padStart(2,"0");
-    const minutes = String(Math.floor((diff%3600000)/60000)).padStart(2,"0");
-    const seconds = String(Math.floor((diff%60000)/1000)).padStart(2,"0");
+    const hours = String(Math.floor(elapsedTime/3600000)).padStart(2,"0");
+    const minutes = String(Math.floor((elapsedTime%3600000)/60000)).padStart(2,"0");
+    const seconds = String(Math.floor((elapsedTime%60000)/1000)).padStart(2,"0");
 
     timerEl.innerText = `${hours}:${minutes}:${seconds}`;
   },1000);
+}
+
+function stopTimer(){
+  clearInterval(timerInterval);
 }
 
 function stopTimer(){
@@ -36,7 +42,7 @@ const statusBar = document.getElementById("statusBar");
 
 // ================= LOAD JOBS =================
 async function loadJobs(){
-  const res = await fetch(API + "/api/jobs/list");
+  const res = await fetch("/api/jobs/list");
   const jobs = await res.json();
 
   jobDropdown.innerHTML = `<option value="">Select Job</option>`;
@@ -58,7 +64,7 @@ jobDropdown.addEventListener("change", async ()=>{
   if(!id) return;
 
   // 🔹 Get Job Details
-  const jobRes = await fetch(API + `/api/jobs/details/${id}`);
+  const jobRes = await fetch(`/api/jobs/details/${id}`);
   const job = await jobRes.json();
   if(!job.success) return;
 
@@ -75,7 +81,7 @@ jobDropdown.addEventListener("change", async ()=>{
   });
 
   // 🔹 Get Production Status
-  const statusRes = await fetch(API + `/api/production/status/${id}`);
+  const statusRes = await fetch(`/api/production/status/${id}`);
   const statusData = await statusRes.json();
 
   if(!statusData.success){
@@ -162,12 +168,9 @@ function updateUI(status){
 
 // ================= START =================
 startBtn.onclick = async ()=>{
-  if(!jobDropdown.value || !operatorName.value || !machineName.value){
-    alert("Fill all fields");
-    return;
-  }
+  if(!validateSelection()) return;
 
-  const res = await fetch(API + "/api/production/start",{
+  const res = await fetch("/api/production/start",{
     method:"POST",
     headers:{ "Content-Type":"application/json"},
     body:JSON.stringify({
@@ -181,20 +184,15 @@ startBtn.onclick = async ()=>{
   const result = await res.json();
 
   if(result.success){
-    const statusRes = await fetch(`/api/production/status/${jobDropdown.value}`);
-    const statusData = await statusRes.json();
-
-    if(statusData.success){
-      updateUI(statusData.status);
-      startTimer(statusData.startTime);
-    }
-  } else {
-    alert(result.message);
+    elapsedTime = 0;
+    startTimer();
+    updateUI("RUNNING");
   }
 };
 
 // ================= HOLD =================
 holdBtn.onclick = async ()=>{
+
   const reason = prompt("Hold reason?");
   if(!reason) return;
 
@@ -208,13 +206,16 @@ holdBtn.onclick = async ()=>{
   });
 
   const result = await res.json();
+
   if(result.success){
+    stopTimer();
     updateUI("HOLD");
   }
 };
 
 // ================= RESUME =================
 resumeBtn.onclick = async ()=>{
+
   const res = await fetch("/api/production/resume",{
     method:"POST",
     headers:{ "Content-Type":"application/json"},
@@ -224,28 +225,37 @@ resumeBtn.onclick = async ()=>{
   });
 
   const result = await res.json();
+
   if(result.success){
+    startTimer();
     updateUI("RUNNING");
   }
 };
 
 // ================= COMPLETE =================
 completeBtn.onclick = async ()=>{
-  await fetch("/api/production/complete",{
+
+  const res = await fetch("/api/production/complete",{
     method:"POST",
     headers:{ "Content-Type":"application/json"},
-    body:JSON.stringify({ jobId:jobDropdown.value })
+    body:JSON.stringify({
+      jobId:jobDropdown.value
+    })
   });
 
-  updateUI("COMPLETED");
-  stopTimer();
+  const result = await res.json();
 
-  // Remove from dropdown
-  loadJobs();
+  if(result.success){
+
+    stopTimer();
+    updateUI("COMPLETED");
+
+    // remove job from dropdown
+    loadJobs();
+  }
 };
 
 window.addEventListener("DOMContentLoaded", () => {
   loadJobs();
 });
-
 
