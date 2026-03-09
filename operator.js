@@ -217,14 +217,11 @@ holdBtn.onclick = async ()=>{
   const result = await res.json();
 
   if(result.success){
-
     updateUI("HOLD");
-
-    stopTimer();
-
   }
 
 };
+
 
 // ================= RESUME =================
 resumeBtn.onclick = async ()=>{
@@ -277,5 +274,6 @@ completeBtn.onclick = async ()=>{
 window.addEventListener("DOMContentLoaded", () => {
   loadJobs();
 });
+
 
 
