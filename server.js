@@ -570,68 +570,117 @@ app.post("/api/production/start", async (req, res) => {
 /* ===============================
    HOLD PRODUCTION
 ================================ */
-app.post("/api/production/hold", async (req, res) => {
+app.post("/api/production/hold", async (req,res)=>{
+
   const { jobId, reason } = req.body;
   const sh = await getSheets();
 
-  const r = await sh.spreadsheets.values.get({
-    spreadsheetId: SPREADSHEET_ID,
-    range: "Production!A:J"
+  const data = await sh.spreadsheets.values.get({
+    spreadsheetId:SPREADSHEET_ID,
+    range:"Production!A:J"
   });
 
-  const rows = r.data.values;
-  const idx = rows.findIndex(r => r[1] === jobId && r[5] === "RUNNING");
+  const rows = data.data.values;
 
-  if (idx === -1) return res.json({ success:false });
+  for(let i=1;i<rows.length;i++){
 
-  rows[idx][5] = "HOLD";
-  rows[idx][8] = reason;
-  rows[idx][9] = new Date().toLocaleString();
+    if(rows[i][1] === jobId){
 
-  await sh.spreadsheets.values.update({
-    spreadsheetId: SPREADSHEET_ID,
-    range: "Production!A:J",
-    valueInputOption: "USER_ENTERED",
-    requestBody: { values: rows }
-  });
+      rows[i][5] = "HOLD";
+rows[i][8] = rows[i][8] || 0;
 
-  res.json({ success:true });
+      await sh.spreadsheets.values.update({
+        spreadsheetId:SPREADSHEET_ID,
+        range:`Production!A${i+1}:J${i+1}`,
+        valueInputOption:"USER_ENTERED",
+        requestBody:{values:[rows[i]]}
+      });
+
+      break;
+
+    }
+
+  }
+
+  res.json({success:true});
+
 });
 
+app.post("/api/production/resume", async (req,res)=>{
+
+  const { jobId } = req.body;
+  const sh = await getSheets();
+
+  const data = await sh.spreadsheets.values.get({
+    spreadsheetId:SPREADSHEET_ID,
+    range:"Production!A:J"
+  });
+
+  const rows = data.data.values;
+
+  for(let i=1;i<rows.length;i++){
+
+    if(rows[i][1] === jobId){
+
+      rows[idx][5] = "RUNNING";
+rows[idx][6] = rows[idx][6];
+
+      await sh.spreadsheets.values.update({
+        spreadsheetId:SPREADSHEET_ID,
+        range:`Production!A${i+1}:J${i+1}`,
+        valueInputOption:"USER_ENTERED",
+        requestBody:{values:[rows[i]]}
+      });
+
+      break;
+
+    }
+
+  }
+
+  res.json({success:true});
+
+});
 
 /* ===============================
    COMPLETE PRODUCTION
 ================================ */
-app.post("/api/operator/complete", async (req, res) => {
-  try {
-    const { jobId } = req.body;
-    const sh = await getSheets();
+app.post("/api/production/complete", async (req,res)=>{
 
-    const jobs = await sh.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: "Jobs!A:J"
-    });
+  const { jobId } = req.body;
+  const sh = await getSheets();
 
-    const rows = jobs.data.values;
-    const idx = rows.findIndex(r => r[0] === jobId);
+  const data = await sh.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range:"Production!A:J"
+  });
 
-    if (idx === -1) return res.json({ success: false });
+  const rows = data.data.values;
 
-    rows[idx][9] = "COMPLETED";
+  for(let i=1;i<rows.length;i++){
 
-    await sh.spreadsheets.values.update({
-      spreadsheetId: SPREADSHEET_ID,
-      range: "Jobs!A:J",
-      valueInputOption: "USER_ENTERED",
-      requestBody: { values: rows }
-    });
+    if(rows[i][1] === jobId){
 
-    res.json({ success: true });
+      rows[i][5] = "COMPLETED";
+      rows[i][7] = new Date().toLocaleString();
 
-  } catch {
-    res.status(500).json({ success: false });
+      await sh.spreadsheets.values.update({
+        spreadsheetId:SPREADSHEET_ID,
+        range:`Production!A${i+1}:J${i+1}`,
+        valueInputOption:"USER_ENTERED",
+        requestBody:{values:[rows[i]]}
+      });
+
+      break;
+
+    }
+
   }
+
+  res.json({success:true});
+
 });
+
 
 // ===============================
 // GET CURRENT PRODUCTION STATUS
@@ -821,112 +870,6 @@ app.post("/api/qc/update", async (req, res) => {
         new Date().toLocaleString()
       ]]
     }
-  });
-
-  res.json({ success: true });
-});
-
-
-/* ===============================
-   START SERVER
-================================ */
-// ===============================
-// INIT DESIGNERS SHEET (ONE TIME)
-// ===============================
-
-/* ======================================================
-   OPERATOR → START PRODUCTION (QR FLOW)
-====================================================== */
-
-/* ===============================
-   OPERATOR – HOLD JOB
-================================ */
-app.post("/api/operator/hold", async (req, res) => {
-  try {
-    const { jobId, reason } = req.body;
-    if (!reason) return res.json({ success:false });
-
-    const sh = await getSheets();
-
-    const r = await sh.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: "Production!A:J"
-    });
-
-    const rows = r.data.values;
-    const idx = rows.findIndex(r => r[1] === jobId && r[4] === "RUNNING");
-
-    rows[idx][4] = "HOLD";
-    rows[idx][6] = new Date().toLocaleString();
-    rows[idx][9] = reason;
-
-    await sh.spreadsheets.values.update({
-      spreadsheetId: SPREADSHEET_ID,
-      range: "Production!A:J",
-      valueInputOption: "USER_ENTERED",
-      requestBody: { values: rows }
-    });
-
-    res.json({ success:true });
-
-  } catch {
-    res.status(500).json({ success:false });
-  }
-});
-
-/* ===============================
-   OPERATOR – COMPLETE JOB
-================================ */
-app.post("/api/operator/complete", async (req, res) => {
-  try {
-    const { jobId } = req.body;
-    const sh = await getSheets();
-
-    const r = await sh.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: "Production!A:J"
-    });
-
-    const rows = r.data.values;
-    const idx = rows.findIndex(r => r[1] === jobId);
-
-    rows[idx][4] = "COMPLETED";
-    rows[idx][8] = new Date().toLocaleString();
-
-    await sh.spreadsheets.values.update({
-      spreadsheetId: SPREADSHEET_ID,
-      range: "Production!A:J",
-      valueInputOption: "USER_ENTERED",
-      requestBody: { values: rows }
-    });
-
-    res.json({ success:true });
-
-  } catch {
-    res.status(500).json({ success:false });
-  }
-});
-
-
-app.post("/api/production/resume", async (req, res) => {
-  const { jobId } = req.body;
-  const sh = await getSheets();
-
-  const r = await sh.spreadsheets.values.get({
-    spreadsheetId: SPREADSHEET_ID,
-    range: "Production!A:J"
-  });
-
-  const rows = r.data.values;
-  const idx = rows.findIndex(r => r[1] === jobId && r[5] === "HOLD");
-
-  rows[idx][5] = "RUNNING";
-
-  await sh.spreadsheets.values.update({
-    spreadsheetId: SPREADSHEET_ID,
-    range: "Production!A:J",
-    valueInputOption: "USER_ENTERED",
-    requestBody: { values: rows }
   });
 
   res.json({ success: true });
@@ -1439,6 +1382,7 @@ qcRows.forEach(row => {
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
+
 
 
 
