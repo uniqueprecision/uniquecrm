@@ -113,8 +113,8 @@ async function ensureDesignersSheet() {
     valueInputOption: "USER_ENTERED",
     requestBody: {
       values: [
-        ["Rahul", "ACTIVE", new Date().getISTTime()],
-        ["Suresh", "ACTIVE", new Date().getISTTime()]
+      ["Rahul", "ACTIVE", getISTTime()],
+["Suresh", "ACTIVE", getISTTime()]
       ]
     }
   });
@@ -133,7 +133,7 @@ app.post("/api/customers", async (req, res) => {
     const data = req.body;
 
     const customerId = "CUST-" + getISTTime();
-    const now = new Date().getISTTime();
+   const now = getISTTime();
 
     await sh.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
@@ -207,7 +207,7 @@ app.post("/api/enquiries", async (req, res) => {
         d.partName, d.quantity, d.material,
         d.drawing, d.process, d.tolerance,
         d.surface, d.delivery,
-        "NEW", new Date().getISTTime()
+        "NEW", getISTTime()
       ]]
     }
   });
@@ -685,7 +685,7 @@ app.post("/api/production/complete", async (req,res)=>{
     if(rows[i][1] === jobId){
 
       const start = new Date(rows[i][6]);
-const total = Math.floor((getISTTime() - start) / 60000);
+const total = Math.floor((Date.now() - start) / 60000);
 
       rows[i][8] = total;
 
@@ -899,7 +899,7 @@ app.post("/api/qc/update", async (req, res) => {
         result,
         remarks,
         checkedBy,
-        new Date().getISTTime()()
+       getISTTime()
       ]]
     }
   });
@@ -1043,7 +1043,7 @@ app.post("/api/qc/process", async (req, res) => {
     } = req.body;
 
     const sh = await getSheets();
-    const now = new Date().getISTTime()();
+   const now = getISTTime();
 
     // Save QC Record
     await sh.spreadsheets.values.append({
