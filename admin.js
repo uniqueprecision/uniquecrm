@@ -195,22 +195,15 @@ async function loadEnquiries() {
       action = e.status;
     }
 
-    row.innerHTML = `
-      <td>${e.id}</td>
-      <td>${e.customerName}</td>
-      <td>${e.requirement || "-"}</td>
-      <td>${action}</td>
-    `;
+   row.innerHTML = `
+  <td>${e.id}</td>
+  <td>${e.customerName}</td>
+  <td>${e.partName || "-"}</td>
+  <td>${action}</td>
+`;
   });
 }
 
-// ===============================
-// OPEN CONVERT MODAL
-// ===============================
-function openConvertModal(enquiryId, customer, part) {
-  document.getElementById("convEnquiryId").value = enquiryId;
-  document.getElementById("convertOrderModal").style.display = "flex";
-}
 
 // ===============================
 // CLOSE MODAL
@@ -295,7 +288,7 @@ document.addEventListener("click", async e => {
       return;
     }
 
-    await fetch("/api/enquiries/status", {
+    fetch(API + "/api/enquiries/status")
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ enquiryId, status: "CONVERTED" })
