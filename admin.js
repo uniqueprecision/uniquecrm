@@ -247,12 +247,11 @@ async function confirmConvertOrder() {
     return;
   }
 
-  await fetch(API + "/api/enquiries/status", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ enquiryId, status: "CONVERTED" })
-  });
-
+ await fetch(API + "/api/enquiries/status", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ enquiryId, status: "CONVERTED" })
+});
   closeConvertModal();
   loadEnquiries();
   loadOrders();
@@ -692,7 +691,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadAdminDashboard();
+  loadAdminOverview();
 });
-
 
