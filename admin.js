@@ -699,5 +699,5 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadAdminDashboard();
+  loadAdminOverview();
 });
